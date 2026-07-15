@@ -1,8 +1,15 @@
+import type { ButtonHTMLAttributes, ReactNode } from "react";
+
 const VARIANTS = {
   primary:
     "bg-indigo-500 text-white hover:bg-indigo-600 focus:ring-indigo-500",
   secondary:
     "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500",
+};
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  children: ReactNode;
+  variant?: keyof typeof VARIANTS;
 };
 
 export default function Button({
@@ -11,7 +18,7 @@ export default function Button({
   variant = "primary",
   className = "",
   ...props
-}) {
+}: ButtonProps) {
   return (
     <button
       type={type}

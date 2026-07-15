@@ -1,8 +1,22 @@
 @import "tailwindcss";
 
+:root {
+  --primary: #5c59e8;
+  --brand: #222b55;
+
+  --neutral-900: hsl(0 0% 7%);
+  --neutral-800: hsl(0 0% 15%);
+  --neutral-700: hsl(0 0% 23%);
+  --neutral-600: hsl(240 2% 35%);
+  --neutral-500: hsl(240 3% 46%);
+  --neutral-400: hsl(240 1% 59%);
+  --neutral-0: hsl(0 0% 100%);
+}
+
 html,
 body,
 #root {
   margin: 0;
   min-height: 100vh;
+  font-family: "Inter", sans-serif;
 }

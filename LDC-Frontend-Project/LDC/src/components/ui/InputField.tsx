@@ -1,8 +1,22 @@
-export default function InputField({ label, id, type = "text", ...props }) {
+import type { InputHTMLAttributes } from "react";
+
+type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
+  label?: string;
+};
+
+export default function InputField({
+  label,
+  id,
+  type = "text",
+  ...props
+}: InputFieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label htmlFor={id} className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor={id}
+          className="text-sm font-medium text-[var(--neutral-600)]"
+        >
           {label}
         </label>
       )}

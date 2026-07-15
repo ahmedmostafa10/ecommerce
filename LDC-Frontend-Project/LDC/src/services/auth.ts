@@ -42,3 +42,13 @@ export async function register(
   });
   return data;
 }
+
+export async function login(
+  payload: LoginRequest,
+): Promise<ApiResponse<Customer>> {
+  const { data } = await api.post<ApiResponse<Customer>>(
+    "/Customer/login",
+    payload,
+  );
+  return data;
+}

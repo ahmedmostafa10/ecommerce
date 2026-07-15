@@ -1,17 +1,22 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { isAxiosError } from "axios";
 import AuthLayout from "../../components/layout/AuthLayout";
 import InputField from "../../components/ui/InputField";
 import Checkbox from "../../components/ui/Checkbox";
 import Button from "../../components/ui/Button";
+import { login } from "../../services/auth";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
     remember: false,
   });
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -21,10 +26,26 @@ export default function Login() {
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: call the backend login endpoint
-    console.log("login", form);
+    setError(null);
+
+    setSubmitting(true);
+    try {
+      const { data: customer } = await login({
+        email: form.email,
+        password: form.password,
+      });
+      localStorage.setItem("customer", JSON.stringify(customer));
+      navigate("/");
+    } catch (err) {
+      setError(
+        (isAxiosError(err) && err.response?.data?.message) ||
+          "Login failed. Please check your credentials and try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -63,7 +84,14 @@ export default function Login() {
             Forgot your password?
           </a>
         </div>
-        <Button type="submit">Sign In</Button>
+        {error && (
+          <p className="text-sm text-red-500" role="alert">
+            {error}
+          </p>
+        )}
+        <Button type="submit" disabled={submitting}>
+          {submitting ? "Signing in..." : "Sign In"}
+        </Button>
       </form>
       <p className="mt-6 text-center text-sm text-gray-500">
         Don't have an account?{" "}

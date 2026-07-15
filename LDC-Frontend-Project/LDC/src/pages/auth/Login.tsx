@@ -37,7 +37,7 @@ export default function Login() {
         password: form.password,
       });
       localStorage.setItem("customer", JSON.stringify(customer));
-      navigate("/products");
+      navigate("/Home");
     } catch (err) {
       setError(
         (isAxiosError(err) && err.response?.data?.message) ||

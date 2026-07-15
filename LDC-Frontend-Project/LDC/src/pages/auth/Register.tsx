@@ -1,11 +1,14 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { isAxiosError } from "axios";
 import AuthLayout from "../../components/layout/AuthLayout";
 import InputField from "../../components/ui/InputField";
 import Button from "../../components/ui/Button";
+import { register } from "../../services/auth";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     address: "",
@@ -14,14 +17,39 @@ export default function Register() {
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: call the backend register endpoint
-    console.log("register", form);
+    setError(null);
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await register({
+        name: form.name,
+        address: form.address,
+        phone: form.phone,
+        email: form.email,
+        password: form.password,
+      });
+      navigate("/login");
+    } catch (err) {
+      setError(
+        (isAxiosError(err) && err.response?.data?.message) ||
+          "Registration failed. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -78,7 +106,14 @@ export default function Register() {
           value={form.confirmPassword}
           onChange={handleChange}
         />
-        <Button type="submit">Sign Up</Button>
+        {error && (
+          <p className="text-sm text-red-500" role="alert">
+            {error}
+          </p>
+        )}
+        <Button type="submit" disabled={submitting}>
+          {submitting ? "Creating account..." : "Sign Up"}
+        </Button>
       </form>
       <p className="mt-6 text-center text-sm text-gray-500">
         Already have an account?{" "}

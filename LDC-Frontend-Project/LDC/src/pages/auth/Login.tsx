@@ -37,11 +37,11 @@ export default function Login() {
         password: form.password,
       });
       localStorage.setItem("customer", JSON.stringify(customer));
-      navigate("/");
+      navigate("/products");
     } catch (err) {
       setError(
         (isAxiosError(err) && err.response?.data?.message) ||
-          "Login failed. Please check your credentials and try again."
+          "Login failed. Please check your credentials and try again.",
       );
     } finally {
       setSubmitting(false);

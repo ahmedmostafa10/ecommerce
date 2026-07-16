@@ -1,8 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 const VARIANTS = {
-  primary:
-    "bg-indigo-500 text-white hover:bg-indigo-600 focus:ring-indigo-500",
+  primary: "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-600",
   secondary:
     "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500",
 };

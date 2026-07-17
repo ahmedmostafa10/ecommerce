@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import Search from "../ui/Search";
 import Logo from "../Logo";
 import Cart from "../Header/Cart";
-import Profile from "../Header/profile";
+import Profile from "../Header/Profile";
 export default function Header() {
+  const navigate = useNavigate();
   return (
     <>
       <header className="bg-white shadow ">
@@ -10,7 +12,7 @@ export default function Header() {
           <Logo />
           <Search />
           <div className="flex items-center gap-2 ml-auto">
-            <Cart />
+            <Cart onClick={() => navigate("/Cart")} />
             <Profile />
           </div>
         </div>

@@ -13,6 +13,7 @@ export type ProductSectionItem = {
 type ProductSectionProps = {
   title: string;
   products: ProductSectionItem[];
+  viewAllTitle?: boolean;
   viewAllHref?: string;
 };
 
@@ -40,6 +41,7 @@ function ChevronIcon({ direction }: { direction: "left" | "right" }) {
 export default function ProductSection({
   title,
   products,
+  viewAllTitle = true,
   viewAllHref = "#",
 }: ProductSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -85,12 +87,13 @@ export default function ProductSection({
             </h2>
             <div className="mx-auto mt-3 h-0.5 w-full max-w-md bg-[var(--brand)]" />
           </div>
-          <a
+          {viewAllTitle && <a
             href={viewAllHref}
             className="absolute right-0 top-0 text-sm text-neutral-500 underline-offset-4 hover:underline"
           >
             View all
           </a>
+          }
         </div>
 
         <div className="relative flex items-center gap-2 sm:gap-4">

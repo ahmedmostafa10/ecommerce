@@ -62,7 +62,7 @@ export default function Products() {
 
       <div className="mx-auto px-4 pb-16 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10 justify-between">
-          <aside className="w-full shrink-0 lg:w-72 xl:w-80 hidden lg:block">
+          <aside className="w-full shrink-0 lg:w-72 xl:w-80">
             <Filter initial={priceRange} onApply={handleFilterApply} />
           </aside>
 

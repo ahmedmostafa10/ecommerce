@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Button from "./Button";
 
 type FilterProps = {
@@ -13,6 +14,31 @@ type FilterProps = {
 const thumb =
   "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-indigo-600 [&::-webkit-slider-thumb]:shadow [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-indigo-500";
 
+function FilterIcon({ className = "h-5 w-5 text-gray-400" }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <line x1="4" y1="21" x2="4" y2="14" />
+      <line x1="4" y1="10" x2="4" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12" y2="3" />
+      <line x1="20" y1="21" x2="20" y2="16" />
+      <line x1="20" y1="12" x2="20" y2="3" />
+      <line x1="1" y1="14" x2="7" y2="14" />
+      <line x1="9" y1="8" x2="15" y2="8" />
+      <line x1="17" y1="16" x2="23" y2="16" />
+    </svg>
+  );
+}
+
 export default function Filter({
   min = 0,
   max = 500,
@@ -23,6 +49,18 @@ export default function Filter({
 }: FilterProps) {
   const [value, setValue] = useState<[number, number]>(initial);
   const [open, setOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileOpen]);
 
   const handleMin = (e: React.ChangeEvent<HTMLInputElement>) =>
     setValue([Math.min(Number(e.target.value), value[1] - step), value[1]]);
@@ -32,32 +70,13 @@ export default function Filter({
 
   const percent = (v: number) => ((v - min) / (max - min)) * 100;
 
-  return (
-    <div className="w-full max-w-xs rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-[var(--brand)]">Filters</h2>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-5 w-5 text-gray-400"
-        >
-          <line x1="4" y1="21" x2="4" y2="14" />
-          <line x1="4" y1="10" x2="4" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="12" />
-          <line x1="12" y1="8" x2="12" y2="3" />
-          <line x1="20" y1="21" x2="20" y2="16" />
-          <line x1="20" y1="12" x2="20" y2="3" />
-          <line x1="1" y1="14" x2="7" y2="14" />
-          <line x1="9" y1="8" x2="15" y2="8" />
-          <line x1="17" y1="16" x2="23" y2="16" />
-        </svg>
-      </div>
+  const handleApply = () => {
+    onApply?.(value);
+    setMobileOpen(false);
+  };
 
+  const filterBody = (
+    <>
       <hr className="my-4 border-gray-200" />
       <button
         type="button"
@@ -120,14 +139,89 @@ export default function Filter({
       )}
 
       <div className="mt-6">
-        <Button
-          type="submit"
-          className="rounded-full!"
-          onClick={() => onApply?.(value)}
-        >
+        <Button type="submit" className="rounded-full!" onClick={handleApply}>
           Apply Filter
         </Button>
       </div>
-    </div>
+    </>
+  );
+
+  const mobileSheet =
+    mobileOpen &&
+    createPortal(
+      <>
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-label="Close filters"
+        />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-filter-title"
+          className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border border-gray-200 bg-white p-5 shadow-lg lg:hidden"
+        >
+          <div className="flex items-center justify-between">
+            <h2
+              id="mobile-filter-title"
+              className="text-lg font-bold text-[var(--brand)]"
+            >
+              Filters
+            </h2>
+            <button
+              type="button"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close filters"
+              className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          {filterBody}
+        </div>
+      </>,
+      document.body,
+    );
+
+  return (
+    <>
+      <div className={`flex items-center justify-between lg:hidden ${className}`}>
+        <h2 className="text-lg font-bold text-[var(--brand)]">Filters</h2>
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open filters"
+          aria-expanded={mobileOpen}
+          className="rounded-full p-1 transition hover:bg-gray-100"
+        >
+          <FilterIcon />
+        </button>
+      </div>
+
+      {mobileSheet}
+
+      <div
+        className={`hidden w-full max-w-xs rounded-2xl border border-gray-200 bg-white p-5 shadow-sm lg:block ${className}`}
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-[var(--brand)]">Filters</h2>
+          <FilterIcon />
+        </div>
+        {filterBody}
+      </div>
+    </>
   );
 }

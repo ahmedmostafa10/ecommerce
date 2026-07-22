@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CloseIcon from "../../assets/icons/CloseIcon";
 
 const AnnouncementBar = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -22,19 +23,7 @@ const AnnouncementBar = () => {
         aria-label="Close announcement"
         className="absolute right-2 top-1/2 -translate-y-1/2 p-2 transition-opacity hover:opacity-70 md:mr-40 sm:mr-20"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-5 w-5"
-        >
-          <path d="M18 6L6 18" />
-          <path d="M6 6L18 18" />
-        </svg>
+        <CloseIcon className="h-5 w-5" />
       </button>
     </div>
   );

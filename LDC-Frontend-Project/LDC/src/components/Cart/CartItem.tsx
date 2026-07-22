@@ -1,4 +1,5 @@
 import QuantitySelector from "../ui/QuantitySelector";
+import TrashIcon from "../../assets/icons/TrashIcon";
 
 export type CartItemData = {
   id: string;
@@ -16,26 +17,6 @@ type CartItemProps = {
   onRemove: (id: string) => void;
   isLast?: boolean;
 };
-
-function TrashIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-[18px] w-[18px]"
-    >
-      <path d="M3 6h18" />
-      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-    </svg>
-  );
-}
 
 export default function CartItem({
   item,
@@ -81,7 +62,7 @@ export default function CartItem({
             aria-label={`Remove ${item.title} from cart`}
             className="shrink-0 text-[#ff3333] transition hover:opacity-70"
           >
-            <TrashIcon />
+            <TrashIcon className="h-[18px] w-[18px]" />
           </button>
 
           <QuantitySelector

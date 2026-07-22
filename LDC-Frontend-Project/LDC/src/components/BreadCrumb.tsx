@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
+import ChevronRightIcon from "../assets/icons/ChevronRightIcon";
 
 export type BreadcrumbItem = {
   label: string;
@@ -10,23 +11,6 @@ type BreadCrumbProps = {
   items: BreadcrumbItem[];
   className?: string;
 };
-
-function ChevronIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-3.5 w-3.5 shrink-0 text-neutral-400"
-    >
-      <path d="M9 18l6-6-6-6" />
-    </svg>
-  );
-}
 
 export default function BreadCrumb({ items, className = "" }: BreadCrumbProps) {
   return (
@@ -42,7 +26,9 @@ export default function BreadCrumb({ items, className = "" }: BreadCrumbProps) {
 
           return (
             <Fragment key={`${item.label}-${index}`}>
-              {index > 0 && <ChevronIcon />}
+              {index > 0 && (
+                <ChevronRightIcon className="h-3.5 w-3.5 shrink-0 text-neutral-400" />
+              )}
               {isLast || !item.href ? (
                 <span className="font-normal text-[var(--brand)]">
                   {item.label}

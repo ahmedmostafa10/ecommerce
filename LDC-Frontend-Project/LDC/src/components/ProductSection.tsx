@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Item from "./ProductCard";
+import ChevronLeftIcon from "../assets/icons/ChevronLeftIcon";
+import ChevronRightIcon from "../assets/icons/ChevronRightIcon";
 
 export type ProductSectionItem = {
   id: string;
@@ -16,27 +18,6 @@ type ProductSectionProps = {
   viewAllTitle?: boolean;
   viewAllHref?: string;
 };
-
-function ChevronIcon({ direction }: { direction: "left" | "right" }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-5 w-5 flex items-center justify-center"
-    >
-      {direction === "left" ? (
-        <path d="M15 18l-6-6 6-6" />
-      ) : (
-        <path d="M9 18l6-6-6-6" />
-      )}
-    </svg>
-  );
-}
 
 export default function ProductSection({
   title,
@@ -104,7 +85,7 @@ export default function ProductSection({
             aria-label={`Previous ${title.toLowerCase()}`}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 text-[var(--brand)] transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <ChevronIcon direction="left" />
+            <ChevronLeftIcon className="h-5 w-5" />
           </button>
 
           <div
@@ -136,7 +117,7 @@ export default function ProductSection({
             aria-label={`Next ${title.toLowerCase()}`}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 text-[var(--brand)] transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <ChevronIcon direction="right" />
+            <ChevronRightIcon className="h-5 w-5" />
           </button>
         </div>
       </div>

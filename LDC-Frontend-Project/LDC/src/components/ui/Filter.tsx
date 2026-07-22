@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import Button from "./Button";
+import Button from "./CustomButton";
+import FilterIcon from "../../assets/icons/FilterIcon";
+import ChevronUpIcon from "../../assets/icons/ChevronUpIcon";
+import CloseIcon from "../../assets/icons/CloseIcon";
 
 type FilterProps = {
   min?: number;
@@ -13,31 +16,6 @@ type FilterProps = {
 
 const thumb =
   "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-indigo-600 [&::-webkit-slider-thumb]:shadow [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-indigo-500";
-
-function FilterIcon({ className = "h-5 w-5 text-gray-400" }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <line x1="4" y1="21" x2="4" y2="14" />
-      <line x1="4" y1="10" x2="4" y2="3" />
-      <line x1="12" y1="21" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12" y2="3" />
-      <line x1="20" y1="21" x2="20" y2="16" />
-      <line x1="20" y1="12" x2="20" y2="3" />
-      <line x1="1" y1="14" x2="7" y2="14" />
-      <line x1="9" y1="8" x2="15" y2="8" />
-      <line x1="17" y1="16" x2="23" y2="16" />
-    </svg>
-  );
-}
 
 export default function Filter({
   min = 0,
@@ -84,18 +62,9 @@ export default function Filter({
         className="flex w-full items-center justify-between"
       >
         <span className="text-base font-bold text-[var(--brand)]">Price</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <ChevronUpIcon
           className={`h-4 w-4 text-gray-600 transition-transform ${open ? "" : "rotate-180"}`}
-        >
-          <polyline points="18 15 12 9 6 15" />
-        </svg>
+        />
       </button>
 
       {open && (
@@ -175,19 +144,7 @@ export default function Filter({
               aria-label="Close filters"
               className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
+              <CloseIcon className="h-5 w-5" />
             </button>
           </div>
           {filterBody}
@@ -198,7 +155,9 @@ export default function Filter({
 
   return (
     <>
-      <div className={`flex items-center justify-between lg:hidden ${className}`}>
+      <div
+        className={`flex items-center justify-between lg:hidden ${className}`}
+      >
         <h2 className="text-lg font-bold text-[var(--brand)]">Filters</h2>
         <button
           type="button"
@@ -207,7 +166,7 @@ export default function Filter({
           aria-expanded={mobileOpen}
           className="rounded-full p-1 transition hover:bg-gray-100"
         >
-          <FilterIcon />
+          <FilterIcon className="h-5 w-5 text-gray-400" />
         </button>
       </div>
 
@@ -218,7 +177,7 @@ export default function Filter({
       >
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-[var(--brand)]">Filters</h2>
-          <FilterIcon />
+          <FilterIcon className="h-5 w-5 text-gray-400" />
         </div>
         {filterBody}
       </div>

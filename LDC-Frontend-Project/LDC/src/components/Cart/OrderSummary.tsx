@@ -1,4 +1,6 @@
 import { useState } from "react";
+import TagIcon from "../../assets/icons/TagIcon";
+import ArrowRightIcon from "../../assets/icons/ArrowRightIcon";
 
 type OrderSummaryProps = {
   subtotal: number;
@@ -10,44 +12,6 @@ type OrderSummaryProps = {
   onApplyPromo?: (code: string) => void;
   className?: string;
 };
-
-function TagIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-4 w-4 text-neutral-400"
-    >
-      <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
-      <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" />
-    </svg>
-  );
-}
-
-function ArrowRightIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-5 w-5"
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
-  );
-}
 
 function SummaryRow({
   label,
@@ -136,7 +100,7 @@ export default function OrderSummary({
       <div className="mt-5 flex gap-3">
         <div className="relative min-w-0 flex-1">
           <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
-            <TagIcon />
+            <TagIcon className="h-4 w-4 text-neutral-400" />
           </span>
           <input
             type="text"
@@ -161,7 +125,7 @@ export default function OrderSummary({
         className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-black text-base font-medium text-white transition hover:opacity-90"
       >
         Go to Checkout
-        <ArrowRightIcon />
+        <ArrowRightIcon className="h-5 w-5" />
       </button>
     </aside>
   );

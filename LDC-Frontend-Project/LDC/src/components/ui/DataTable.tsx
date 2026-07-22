@@ -1,14 +1,16 @@
-import { Fragment, useState, type ReactNode } from "react";
-import { ChevronDown } from "lucide-react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
+import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
 import BreadCrumb, { type BreadcrumbItem } from "../BreadCrumb";
 import TableToolbar from "./TableToolbar";
 import Pagination from "./Pagination";
 
-export type Column = {
+export type Column<T> = {
   header: ReactNode;
-  sortable?: boolean;
+  sortValue?: (row: T) => string | number;
   className?: string;
 };
+
+type SortState = { index: number; dir: "asc" | "desc" };
 
 type DataTableProps<T> = {
   title: string;
@@ -20,7 +22,7 @@ type DataTableProps<T> = {
   searchPlaceholder?: string;
   toolbar?: ReactNode;
 
-  columns: Column[];
+  columns: Column<T>[];
   rows: T[];
   rowKey: (row: T) => string;
   renderRow: (
@@ -34,8 +36,13 @@ type DataTableProps<T> = {
   selectAllLabel?: string;
 };
 
-function SortIcon() {
-  return <ChevronDown size={14} className="ml-1 inline text-gray-400" />;
+function SortIcon({ dir }: { dir?: "asc" | "desc" }) {
+  if (!dir) return <ChevronsUpDown size={14} className="text-gray-300" />;
+  return dir === "asc" ? (
+    <ChevronUp size={14} className="text-violet-600" />
+  ) : (
+    <ChevronDown size={14} className="text-violet-600" />
+  );
 }
 
 export default function DataTable<T>({
@@ -57,13 +64,38 @@ export default function DataTable<T>({
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [sort, setSort] = useState<SortState | null>(null);
 
-  const totalCount = rows.length;
+  function toggleSort(index: number) {
+    setSort((prev) =>
+      prev?.index === index
+        ? { index, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { index, dir: "asc" },
+    );
+    setCurrentPage(1);
+  }
+
+  const sortedRows = useMemo(() => {
+    const getValue = sort ? columns[sort.index]?.sortValue : undefined;
+    if (!sort || !getValue) return rows;
+
+    const factor = sort.dir === "asc" ? 1 : -1;
+    return [...rows].sort((a, b) => {
+      const av = getValue(a);
+      const bv = getValue(b);
+      if (typeof av === "number" && typeof bv === "number") {
+        return (av - bv) * factor;
+      }
+      return String(av).localeCompare(String(bv)) * factor;
+    });
+  }, [rows, sort, columns]);
+
+  const totalCount = sortedRows.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
   const page = Math.min(currentPage, totalPages);
 
   const startIdx = (page - 1) * itemsPerPage;
-  const pageRows = rows.slice(startIdx, startIdx + itemsPerPage);
+  const pageRows = sortedRows.slice(startIdx, startIdx + itemsPerPage);
 
   const allSelected =
     pageRows.length > 0 && pageRows.every((r) => selectedIds.has(rowKey(r)));
@@ -134,17 +166,37 @@ export default function DataTable<T>({
                     aria-label={selectAllLabel}
                   />
                 </th>
-                {columns.map((col, i) => (
-                  <th
-                    key={i}
-                    className={`py-3.5 font-semibold ${
-                      i === columns.length - 1 ? "pr-5" : "pr-4"
-                    } ${col.className ?? ""}`}
-                  >
-                    {col.header}
-                    {col.sortable && <SortIcon />}
-                  </th>
-                ))}
+                {columns.map((col, i) => {
+                  const active = sort?.index === i;
+                  return (
+                    <th
+                      key={i}
+                      aria-sort={
+                        active
+                          ? sort.dir === "asc"
+                            ? "ascending"
+                            : "descending"
+                          : undefined
+                      }
+                      className={`py-3.5 font-semibold ${
+                        i === columns.length - 1 ? "pr-5" : "pr-4"
+                      } ${col.className ?? ""}`}
+                    >
+                      {col.sortValue ? (
+                        <button
+                          type="button"
+                          onClick={() => toggleSort(i)}
+                          className="inline-flex items-center gap-1 uppercase tracking-wider transition hover:text-gray-700"
+                        >
+                          {col.header}
+                          <SortIcon dir={active ? sort.dir : undefined} />
+                        </button>
+                      ) : (
+                        col.header
+                      )}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>

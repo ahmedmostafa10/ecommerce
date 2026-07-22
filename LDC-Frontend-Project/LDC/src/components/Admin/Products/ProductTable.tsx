@@ -14,18 +14,18 @@ import ProductRow from "./ProductRow";
 import type { Product } from "./ProductRow";
 import { adminProducts } from "../../../data/adminProducts";
 
-const COLUMNS: Column[] = [
-  { header: "Product", sortable: true },
+const STATUSES = ["Published", "Low Stock", "Out of Stock", "Draft"];
+
+const COLUMNS: Column<Product>[] = [
+  { header: "Product", sortValue: (p) => p.name },
   { header: "SKU" },
-  { header: "Category", sortable: true },
-  { header: "Stock", sortable: true },
-  { header: "Price" },
-  { header: "Status", sortable: true },
-  { header: "Added", sortable: true },
+  { header: "Category", sortValue: (p) => p.category },
+  { header: "Stock", sortValue: (p) => p.stock },
+  { header: "Price", sortValue: (p) => p.price },
+  { header: "Status", sortValue: (p) => STATUSES.indexOf(p.status) },
+  { header: "Added", sortValue: (p) => Date.parse(p.added) || 0 },
   { header: "Action" },
 ];
-
-const STATUSES = ["Published", "Low Stock", "Out of Stock", "Draft"];
 
 export default function ProductTable() {
   const [search, setSearch] = useState("");

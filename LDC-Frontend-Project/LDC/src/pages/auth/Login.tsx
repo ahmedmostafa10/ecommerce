@@ -5,7 +5,7 @@ import { isAxiosError } from "axios";
 import AuthLayout from "../../components/layout/AuthLayout";
 import InputField from "../../components/ui/InputField";
 import Checkbox from "../../components/ui/Checkbox";
-import Button from "../../components/ui/Button";
+import Button from "../../components/ui/CustomButton";
 import { login } from "../../services/auth";
 
 export default function Login() {
@@ -32,11 +32,15 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      const { data: customer } = await login({
+      const { data: user } = await login({
         email: form.email,
         password: form.password,
       });
-      localStorage.setItem("customer", JSON.stringify(customer));
+      if (form.remember) {
+        localStorage.setItem("token", JSON.stringify(user.token));
+      } else {
+        sessionStorage.setItem("token", JSON.stringify(user.token));
+      }
       navigate("/Home");
     } catch (err) {
       setError(

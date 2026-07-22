@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { isAxiosError } from "axios";
 import AuthLayout from "../../components/layout/AuthLayout";
 import InputField from "../../components/ui/InputField";
-import Button from "../../components/ui/Button";
+import Button from "../../components/ui/CustomButton";
 import { register } from "../../services/auth";
 
 export default function Register() {
@@ -34,18 +34,19 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      await register({
+      const { data: user } = await register({
         name: form.name,
         address: form.address,
         phone: form.phone,
         email: form.email,
         password: form.password,
       });
-      navigate("/login");
+      localStorage.setItem("token", JSON.stringify(user.token));
+      navigate("/Home");
     } catch (err) {
       setError(
         (isAxiosError(err) && err.response?.data?.message) ||
-          "Registration failed. Please try again."
+          "Registration failed. Please try again.",
       );
     } finally {
       setSubmitting(false);

@@ -2,16 +2,16 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import DataTable, { type Column } from "../../ui/DataTable";
+import DateFilter from "../../ui/DateFilter";
+import FilterDropdown from "../../ui/FilterDropdown";
+import {
+  emptyRange,
+  inDateRange,
+  uniqueValues,
+  useFilters,
+} from "../../ui/filtering";
 import ProductRow from "./ProductRow";
 import type { Product } from "./ProductRow";
-import DateFilter from "./DateFilter";
-import ProductFilters from "./ProductFilters";
-import {
-  categoriesOf,
-  emptyFilters,
-  emptyRange,
-  filterProducts,
-} from "./productFiltering";
 import { adminProducts } from "../../../data/adminProducts";
 
 const COLUMNS: Column[] = [
@@ -25,17 +25,32 @@ const COLUMNS: Column[] = [
   { header: "Action" },
 ];
 
+const STATUSES = ["Published", "Low Stock", "Out of Stock", "Draft"];
+
 export default function ProductTable() {
   const [search, setSearch] = useState("");
   const [range, setRange] = useState(emptyRange);
-  const [filters, setFilters] = useState(emptyFilters);
+  const { toggleFilter, clearFilters, selected, matches, activeCount } =
+    useFilters();
 
-  const categories = useMemo(() => categoriesOf(adminProducts), []);
-
-  const filtered = useMemo(
-    () => filterProducts(adminProducts, search, range, filters),
-    [search, range, filters],
+  const categories = useMemo(
+    () => uniqueValues(adminProducts, (p) => p.category),
+    [],
   );
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return adminProducts.filter(
+      (p) =>
+        (!q ||
+          p.name.toLowerCase().includes(q) ||
+          p.sku.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q)) &&
+        matches("status", p.status) &&
+        matches("category", p.category) &&
+        inDateRange(p.added, range),
+    );
+  }, [search, range, matches]);
 
   return (
     <DataTable<Product>
@@ -60,20 +75,34 @@ export default function ProductTable() {
       toolbar={
         <>
           <DateFilter value={range} onChange={setRange} />
-          <ProductFilters
-            value={filters}
-            categories={categories}
-            onChange={setFilters}
+          <FilterDropdown
+            groups={[
+              {
+                key: "status",
+                label: "Status",
+                options: STATUSES,
+                selected: selected("status"),
+              },
+              {
+                key: "category",
+                label: "Category",
+                options: categories,
+                selected: selected("category"),
+              },
+            ]}
+            onToggle={toggleFilter}
+            onClear={clearFilters}
+            activeCount={activeCount}
           />
         </>
       }
       columns={COLUMNS}
       rows={filtered}
       rowKey={(product) => product.id}
-      renderRow={(product, selected, toggle) => (
+      renderRow={(product, isSelected, toggle) => (
         <ProductRow
           product={product}
-          selected={selected}
+          selected={isSelected}
           onToggle={toggle}
           onView={(p) => console.log("View", p.name)}
           onEdit={(p) => console.log("Edit", p.name)}
@@ -83,7 +112,6 @@ export default function ProductTable() {
       emptyMessage="No products found."
       minWidth={900}
       selectAllLabel="Select all products"
-      card={false}
     />
   );
 }

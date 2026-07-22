@@ -1,24 +1,29 @@
 import { Calendar } from "lucide-react";
-import Dropdown from "../../ui/Dropdown";
-import { emptyRange, type DateRange } from "./productFiltering";
+import Dropdown from "./Dropdown";
+import { emptyRange, isRangeActive, type DateRange } from "./filtering";
 
 type Props = {
   value: DateRange;
   onChange: (range: DateRange) => void;
+  label?: string;
 };
 
 const field =
   "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100";
 
-export default function DateFilter({ value, onChange }: Props) {
-  const active = Boolean(value.from || value.to);
+export default function DateFilter({
+  value,
+  onChange,
+  label = "Select Dates",
+}: Props) {
+  const active = isRangeActive(value);
 
   return (
     <Dropdown
       trigger={
         <>
           <Calendar size={15} />
-          Select Dates
+          {label}
         </>
       }
       badge={active ? 1 : 0}

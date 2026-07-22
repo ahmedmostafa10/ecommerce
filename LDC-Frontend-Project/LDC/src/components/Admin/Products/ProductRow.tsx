@@ -45,7 +45,7 @@ export default function ProductRow({
   onDelete,
 }: ProductRowProps) {
   return (
-    <tr className="group border-b border-gray-100 transition-colors hover:bg-violet-50/30">
+    <tr className="group border-b border-[#E0E2E7] bg-white transition-colors hover:bg-violet-50/30">
       {/* Checkbox */}
       <td className="w-12 py-3 pl-5 pr-2">
         <input

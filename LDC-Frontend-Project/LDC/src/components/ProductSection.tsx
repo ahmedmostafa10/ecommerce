@@ -7,7 +7,7 @@ export type ProductSectionItem = {
   id: string;
   image: string;
   title: string;
-  rating: number;
+  rating?: number;
   price: number;
   originalPrice?: number;
 };

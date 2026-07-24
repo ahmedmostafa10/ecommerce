@@ -85,9 +85,9 @@ export default function Categories({ onSelect }: CategoriesProps) {
         ) : (
           <div className="grid grid-cols-3 gap-4 lg:grid-cols-6 sm:gap-6 lg:gap-8">
             {categories.map((category) => (
-              <button
+              <Link
                 key={category.type}
-                type="button"
+                to={`/products?type=${encodeURIComponent(category.type)}`}
                 onClick={() => onSelect?.(category.type)}
                 className="group flex flex-col items-center gap-3"
               >
@@ -102,7 +102,7 @@ export default function Categories({ onSelect }: CategoriesProps) {
                 <span className="text-sm font-medium text-[var(--brand)] decoration-[var(--brand)] underline-offset-4 transition-all group-hover:underline sm:text-base">
                   {category.type}
                 </span>
-              </button>
+              </Link>
             ))}
           </div>
         )}

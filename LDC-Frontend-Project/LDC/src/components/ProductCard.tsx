@@ -3,7 +3,7 @@ import Rating from "./ui/Rating";
 type ItemProps = {
   image: string;
   title: string;
-  rating: number;
+  rating?: number;
   price: number;
   originalPrice?: number;
   onClick?: () => void;
@@ -47,7 +47,7 @@ export default function Item({
           {title}
         </h3>
 
-        <Rating value={rating} />
+        {rating !== undefined && <Rating value={rating} />}
 
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-2xl font-bold text-[var(--brand)]">${price}</p>

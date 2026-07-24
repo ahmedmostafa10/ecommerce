@@ -37,6 +37,16 @@ export type ProductResponse = {
   type: string;
   stockQuantity: number;
   status: string;
+  sku?: string | null;
+  discountType?: string | null;
+  discountPercentage: number;
+  taxClass?: string | null;
+  vatAmount: number;
+  isPhysical: boolean;
+  weight?: string | null;
+  height?: string | null;
+  length?: string | null;
+  width?: string | null;
   isDeleted: boolean;
   createdOn: string;
   updatedOn: string;
@@ -68,15 +78,30 @@ export async function deleteProduct(id: string): Promise<void> {
   await api.delete(`/Product/${id}`);
 }
 
+export type PagedProducts = {
+  items: ProductResponse[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+};
+
 export async function getProducts(
   pageNumber = 1,
   pageSize = 10,
   type?: string,
-): Promise<ProductResponse[]> {
-  const { data } = await api.get<ApiResponse<ProductResponse[]>>("/Product", {
+): Promise<PagedProducts> {
+  const { data } = await api.get<ApiResponse<PagedProducts>>("/Product", {
     params: { pageNumber, pageSize, ...(type ? { type } : {}) },
   });
-  return data.data ?? [];
+  const paged = data.data;
+  return {
+    items: paged?.items ?? [],
+    totalCount: paged?.totalCount ?? 0,
+    pageNumber: paged?.pageNumber ?? pageNumber,
+    pageSize: paged?.pageSize ?? pageSize,
+    totalPages: paged?.totalPages ?? 0,
+  };
 }
 
 export async function getProductById(id: string): Promise<ProductResponse> {
@@ -92,3 +117,22 @@ export async function getCategories(): Promise<Categories> {
   );
   return data.data ?? [];
 }
+
+async function getSection(
+  path: string,
+  count = 10,
+): Promise<ProductResponse[]> {
+  const { data } = await api.get<ApiResponse<ProductResponse[]>>(path, {
+    params: { count },
+  });
+  return data.data ?? [];
+}
+
+export const getBestSellers = (count = 10) =>
+  getSection("/Product/best-sellers", count);
+
+export const getNewArrivals = (count = 10) =>
+  getSection("/Product/new-arrivals", count);
+
+export const getLastPieces = (count = 10) =>
+  getSection("/Product/last-pieces", count);

@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { X } from "lucide-react";
 import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header";
 import AnnouncementBar from "../../components/Header/AnnouncementBar";
@@ -6,78 +8,142 @@ import BreadCrumb from "../../components/BreadCrumb";
 import Filter from "../../components/ui/Filter";
 import Pagination from "../../components/ui/Pagination";
 import ProductGrid, {
-  ALL_PRODUCTS,
   type ProductGridItem,
 } from "../../components/ProductGrid";
+import { getProducts, type ProductResponse } from "../../services/products";
+import placeholderImg from "../../assets/categories/image.png";
 
 const PAGE_SIZE = 10;
-const TOTAL_PRODUCTS = 80;
-const TOTAL_PAGES = Math.ceil(TOTAL_PRODUCTS / PAGE_SIZE);
 
-function getPageProducts(
-  products: ProductGridItem[],
-  page: number,
-): ProductGridItem[] {
-  const start = (page - 1) * PAGE_SIZE;
-
-  return Array.from({ length: PAGE_SIZE }, (_, index) => {
-    const product = products[(start + index) % products.length];
-    return {
-      ...product,
-      id: `${product.id}-page-${page}-${index}`,
-    };
-  });
+function toGridItem(product: ProductResponse): ProductGridItem {
+  const pct = product.discountPercentage ?? 0;
+  return {
+    id: product.id,
+    image: product.productImages[0]?.url ?? placeholderImg,
+    title: product.name,
+    price: product.amount,
+    originalPrice:
+      pct > 0 ? Math.round(product.amount / (1 - pct / 100)) : undefined,
+  };
 }
 
 export default function Products() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [priceRange, setPriceRange] = useState<[number, number]>([50, 200]);
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type") ?? undefined;
 
-  const filteredProducts = useMemo(
-    () =>
-      ALL_PRODUCTS.filter(
-        (product) =>
-          product.price >= priceRange[0] && product.price <= priceRange[1],
-      ),
-    [priceRange],
-  );
+  const [products, setProducts] = useState<ProductGridItem[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
+
+  useEffect(() => setCurrentPage(1), [type]);
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError(false);
+
+    getProducts(currentPage, PAGE_SIZE, type)
+      .then((data) => {
+        if (!active) return;
+        setProducts(data.items.map(toGridItem));
+        setTotalCount(data.totalCount);
+      })
+      .catch(() => active && setError(true))
+      .finally(() => active && setLoading(false));
+
+    return () => {
+      active = false;
+    };
+  }, [type, currentPage]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const page = Math.min(currentPage, totalPages);
 
   const pageProducts = useMemo(
-    () => getPageProducts(filteredProducts, currentPage),
-    [filteredProducts, currentPage],
+    () =>
+      priceRange
+        ? products.filter(
+            (p) => p.price >= priceRange[0] && p.price <= priceRange[1],
+          )
+        : products,
+    [products, priceRange],
   );
 
-  const handleFilterApply = (value: [number, number]) => {
+  function handleFilterApply(value: [number, number]) {
     setPriceRange(value);
-    setCurrentPage(1);
-  };
+  }
 
   return (
     <>
       <AnnouncementBar />
       <Header />
       <BreadCrumb
-        items={[{ label: "Home", href: "/Home" }, { label: "Products" }]}
+        items={[
+          { label: "Home", href: "/Home" },
+          ...(type
+            ? [{ label: "Products", href: "/products" }, { label: type }]
+            : [{ label: "Products" }]),
+        ]}
       />
 
       <div className="mx-auto px-4 pb-16 sm:px-6 lg:px-8">
+        {type && (
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <span className="text-sm text-neutral-500">Filtered by:</span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-3 py-1.5 text-sm font-medium text-white">
+              {type}
+              <Link
+                to="/products"
+                aria-label="Clear category filter"
+                className="rounded-full p-0.5 transition hover:bg-white/20"
+              >
+                <X size={14} />
+              </Link>
+            </span>
+          </div>
+        )}
+
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10 justify-between">
           <aside className="w-full shrink-0 lg:w-72 xl:w-80">
-            <Filter initial={priceRange} onApply={handleFilterApply} />
+            <Filter
+              min={0}
+              max={10000}
+              initial={priceRange ?? [0, 10000]}
+              onApply={handleFilterApply}
+            />
           </aside>
 
           <div className="flex min-w-0 flex-1 flex-col gap-10">
-            <ProductGrid
-              products={pageProducts}
-              totalProducts={TOTAL_PRODUCTS}
-              currentPage={currentPage}
-              pageSize={PAGE_SIZE}
-            />
-            <Pagination
-              currentPage={currentPage}
-              totalPages={TOTAL_PAGES}
-              onPageChange={setCurrentPage}
-            />
+            {loading ? (
+              <p className="py-20 text-center text-sm text-neutral-400">
+                Loading products...
+              </p>
+            ) : error ? (
+              <p className="py-20 text-center text-sm text-red-500">
+                Could not load products.
+              </p>
+            ) : pageProducts.length === 0 ? (
+              <p className="py-20 text-center text-sm text-neutral-400">
+                No products found{type ? ` in ${type}` : ""}.
+              </p>
+            ) : (
+              <>
+                <ProductGrid
+                  products={pageProducts}
+                  totalProducts={totalCount}
+                  currentPage={page}
+                  pageSize={PAGE_SIZE}
+                />
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

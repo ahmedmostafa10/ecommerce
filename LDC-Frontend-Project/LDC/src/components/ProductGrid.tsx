@@ -12,7 +12,7 @@ export type ProductGridItem = {
   id: string;
   image: string;
   title: string;
-  rating: number;
+  rating?: number;
   price: number;
   originalPrice?: number;
 };
@@ -115,7 +115,7 @@ function sortProducts(products: ProductGridItem[], sortBy: SortOption) {
     case "price-high-low":
       return sorted.sort((a, b) => b.price - a.price);
     case "rating":
-      return sorted.sort((a, b) => b.rating - a.rating);
+      return sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     default:
       return sorted;
   }

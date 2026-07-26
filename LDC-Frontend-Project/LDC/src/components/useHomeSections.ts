@@ -12,7 +12,8 @@ function toSectionItem(product: ProductResponse): ProductSectionItem {
   const pct = product.discountPercentage ?? 0;
   return {
     id: product.id,
-    image: product.productImages[0]?.url ?? placeholderImg,
+    image:
+      product.coverImageUrl ?? product.productImages[0]?.url ?? placeholderImg,
     title: product.name,
     price: product.amount,
     originalPrice:

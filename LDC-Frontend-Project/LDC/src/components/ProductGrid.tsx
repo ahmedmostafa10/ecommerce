@@ -177,6 +177,7 @@ export default function ProductGrid({
         {sortedProducts.map((product) => (
           <ProductCard
             key={product.id}
+            href={`/products/${product.id}`}
             image={product.image}
             title={product.title}
             rating={product.rating}

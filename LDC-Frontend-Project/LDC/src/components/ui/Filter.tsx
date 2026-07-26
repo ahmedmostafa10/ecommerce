@@ -21,7 +21,7 @@ export default function Filter({
   min = 0,
   max = 500,
   step = 1,
-  initial = [50, 200],
+  initial = [50, 1000],
   onApply,
   className = "",
 }: FilterProps) {

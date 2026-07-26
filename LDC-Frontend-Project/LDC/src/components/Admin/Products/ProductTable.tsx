@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import DataTable, { type Column } from "../../ui/DataTable";
 import DateFilter from "../../ui/DateFilter";
@@ -10,9 +10,12 @@ import {
   uniqueValues,
   useFilters,
 } from "../../ui/filtering";
+import ConfirmDialog from "../../ui/ConfirmDialog";
+import { useToast } from "../../ui/ToastProvider";
 import ProductRow from "./ProductRow";
 import type { Product } from "./ProductRow";
-import { adminProducts } from "../../../data/adminProducts";
+import { useProducts } from "./useProducts";
+import { deleteProduct } from "../../../services/products";
 
 const STATUSES = ["Published", "Low Stock", "Out of Stock", "Draft"];
 
@@ -33,14 +36,42 @@ export default function ProductTable() {
   const { toggleFilter, clearFilters, selected, matches, activeCount } =
     useFilters();
 
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { products, loading, error, refetch } = useProducts();
+
+  const [pendingDelete, setPendingDelete] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleConfirmDelete() {
+    if (!pendingDelete) return;
+
+    setDeleting(true);
+    try {
+      await deleteProduct(pendingDelete.id);
+      toast({ message: "Product deleted", description: pendingDelete.name });
+      setPendingDelete(null);
+      await refetch();
+    } catch (err) {
+      toast({
+        message: "Could not delete product",
+        description:
+          err instanceof Error ? err.message : "Please try again.",
+        variant: "error",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   const categories = useMemo(
-    () => uniqueValues(adminProducts, (p) => p.category),
-    [],
+    () => uniqueValues(products, (p) => p.category),
+    [products],
   );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return adminProducts.filter(
+    return products.filter(
       (p) =>
         (!q ||
           p.name.toLowerCase().includes(q) ||
@@ -50,9 +81,10 @@ export default function ProductTable() {
         matches("category", p.category) &&
         inDateRange(p.added, range),
     );
-  }, [search, range, matches]);
+  }, [products, search, range, matches]);
 
   return (
+    <>
     <DataTable<Product>
       title="Product"
       breadcrumb={[
@@ -104,14 +136,28 @@ export default function ProductTable() {
           product={product}
           selected={isSelected}
           onToggle={toggle}
-          onView={(p) => console.log("View", p.name)}
-          onEdit={(p) => console.log("Edit", p.name)}
-          onDelete={(p) => console.log("Delete", p.name)}
+          onView={(p) => navigate(`/products/${p.id}`)}
+          onEdit={(p) => navigate(`/admin/products/${p.id}/edit`)}
+          onDelete={(p) => setPendingDelete(p)}
         />
       )}
       emptyMessage="No products found."
+      loading={loading}
+      error={error}
       minWidth={900}
       selectAllLabel="Select all products"
     />
+
+    <ConfirmDialog
+      open={pendingDelete !== null}
+      title="Delete product"
+      message={`"${pendingDelete?.name}" will be removed from the store. This can't be undone from here.`}
+      confirmLabel="Delete"
+      destructive
+      busy={deleting}
+      onConfirm={handleConfirmDelete}
+      onCancel={() => setPendingDelete(null)}
+    />
+    </>
   );
 }

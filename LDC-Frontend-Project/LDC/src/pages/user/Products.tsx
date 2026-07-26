@@ -10,16 +10,35 @@ import Pagination from "../../components/ui/Pagination";
 import ProductGrid, {
   type ProductGridItem,
 } from "../../components/ProductGrid";
-import { getProducts, type ProductResponse } from "../../services/products";
+import {
+  getProducts,
+  getBestSellers,
+  getNewArrivals,
+  getLastPieces,
+  type ProductResponse,
+} from "../../services/products";
 import placeholderImg from "../../assets/categories/image.png";
 
 const PAGE_SIZE = 10;
+
+const SECTIONS = {
+  "best-sellers": { label: "Best Sellers", fetch: getBestSellers },
+  "new-arrivals": { label: "New Arrivals", fetch: getNewArrivals },
+  "last-pieces": { label: "Last Pieces", fetch: getLastPieces },
+} as const;
+
+type SectionKey = keyof typeof SECTIONS;
+
+function isSectionKey(value: string | null): value is SectionKey {
+  return value !== null && value in SECTIONS;
+}
 
 function toGridItem(product: ProductResponse): ProductGridItem {
   const pct = product.discountPercentage ?? 0;
   return {
     id: product.id,
-    image: product.productImages[0]?.url ?? placeholderImg,
+    image:
+      product.coverImageUrl ?? product.productImages[0]?.url ?? placeholderImg,
     title: product.name,
     price: product.amount,
     originalPrice:
@@ -30,6 +49,9 @@ function toGridItem(product: ProductResponse): ProductGridItem {
 export default function Products() {
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type") ?? undefined;
+  const sectionParam = searchParams.get("section");
+  const section = isSectionKey(sectionParam) ? sectionParam : undefined;
+  const activeLabel = section ? SECTIONS[section].label : type;
 
   const [products, setProducts] = useState<ProductGridItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -39,13 +61,21 @@ export default function Products() {
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
 
-  useEffect(() => setCurrentPage(1), [type]);
+  useEffect(() => setCurrentPage(1), [type, section]);
+
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError(false);
 
-    getProducts(currentPage, PAGE_SIZE, type)
+    const request = section
+      ? SECTIONS[section].fetch(100).then((items) => ({
+          items,
+          totalCount: items.length,
+        }))
+      : getProducts(currentPage, PAGE_SIZE, type);
+
+    request
       .then((data) => {
         if (!active) return;
         setProducts(data.items.map(toGridItem));
@@ -57,20 +87,22 @@ export default function Products() {
     return () => {
       active = false;
     };
-  }, [type, currentPage]);
+  }, [type, section, currentPage]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const page = Math.min(currentPage, totalPages);
 
-  const pageProducts = useMemo(
-    () =>
-      priceRange
-        ? products.filter(
-            (p) => p.price >= priceRange[0] && p.price <= priceRange[1],
-          )
-        : products,
-    [products, priceRange],
-  );
+  const pageProducts = useMemo(() => {
+    const priced = priceRange
+      ? products.filter(
+          (p) => p.price >= priceRange[0] && p.price <= priceRange[1],
+        )
+      : products;
+
+    return section
+      ? priced.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+      : priced;
+  }, [products, priceRange, section, page]);
 
   function handleFilterApply(value: [number, number]) {
     setPriceRange(value);
@@ -83,21 +115,23 @@ export default function Products() {
       <BreadCrumb
         items={[
           { label: "Home", href: "/Home" },
-          ...(type
-            ? [{ label: "Products", href: "/products" }, { label: type }]
+          ...(activeLabel
+            ? [{ label: "Products", href: "/products" }, { label: activeLabel }]
             : [{ label: "Products" }]),
         ]}
       />
 
       <div className="mx-auto px-4 pb-16 sm:px-6 lg:px-8">
-        {type && (
+        {activeLabel && (
           <div className="mb-6 flex flex-wrap items-center gap-3">
-            <span className="text-sm text-neutral-500">Filtered by:</span>
+            <span className="text-sm text-neutral-500">
+              {section ? "Showing:" : "Filtered by:"}
+            </span>
             <span className="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-3 py-1.5 text-sm font-medium text-white">
-              {type}
+              {activeLabel}
               <Link
                 to="/products"
-                aria-label="Clear category filter"
+                aria-label="Clear filter"
                 className="rounded-full p-0.5 transition hover:bg-white/20"
               >
                 <X size={14} />
@@ -127,7 +161,7 @@ export default function Products() {
               </p>
             ) : pageProducts.length === 0 ? (
               <p className="py-20 text-center text-sm text-neutral-400">
-                No products found{type ? ` in ${type}` : ""}.
+                No products found{activeLabel ? ` in ${activeLabel}` : ""}.
               </p>
             ) : (
               <>

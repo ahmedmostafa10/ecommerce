@@ -18,6 +18,7 @@ export type ProductRequest = {
   height?: string;
   length?: string;
   width?: string;
+  coverImageUrl?: string;
   productImages: { url: string }[];
 };
 
@@ -50,7 +51,8 @@ export type ProductResponse = {
   isDeleted: boolean;
   createdOn: string;
   updatedOn: string;
-  productImages: { productImageId: string; url: string }[];
+  coverImageUrl: string | null;
+  productImages: { productImageId: string; url: string; isCover: boolean }[];
 };
 
 export async function createProduct(

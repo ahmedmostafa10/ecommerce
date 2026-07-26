@@ -1,5 +1,10 @@
 import { Fragment, useMemo, useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  Loader2,
+} from "lucide-react";
 import BreadCrumb, { type BreadcrumbItem } from "../BreadCrumb";
 import TableToolbar from "./TableToolbar";
 import Pagination from "./Pagination";
@@ -31,6 +36,8 @@ type DataTableProps<T> = {
     toggle: (id: string) => void,
   ) => ReactNode;
   emptyMessage?: string;
+  loading?: boolean;
+  error?: string | null;
   itemsPerPage?: number;
   minWidth?: number;
   selectAllLabel?: string;
@@ -58,6 +65,8 @@ export default function DataTable<T>({
   rowKey,
   renderRow,
   emptyMessage = "No results found.",
+  loading = false,
+  error = null,
   itemsPerPage = 10,
   minWidth = 950,
   selectAllLabel = "Select all rows",
@@ -200,13 +209,22 @@ export default function DataTable<T>({
               </tr>
             </thead>
             <tbody>
-              {pageRows.length === 0 ? (
+              {loading || error || pageRows.length === 0 ? (
                 <tr>
                   <td
                     colSpan={columns.length + 1}
-                    className="py-20 text-center text-sm text-gray-400"
+                    className={`py-20 text-center text-sm ${
+                      error ? "text-red-500" : "text-gray-400"
+                    }`}
                   >
-                    {emptyMessage}
+                    {loading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Loader2 size={16} className="animate-spin" />
+                        Loading...
+                      </span>
+                    ) : (
+                      (error ?? emptyMessage)
+                    )}
                   </td>
                 </tr>
               ) : (

@@ -14,13 +14,25 @@ export default function Products() {
       <Header />
       <Categories />
       {!loading && bestSellers.length > 0 && (
-        <ProductSection title="BEST SELLERS" products={bestSellers} />
+        <ProductSection
+          title="BEST SELLERS"
+          products={bestSellers}
+          viewAllHref="/products?section=best-sellers"
+        />
       )}
       {!loading && newArrivals.length > 0 && (
-        <ProductSection title="NEW ARRIVALS" products={newArrivals} />
+        <ProductSection
+          title="NEW ARRIVALS"
+          products={newArrivals}
+          viewAllHref="/products?section=new-arrivals"
+        />
       )}
       {!loading && lastPieces.length > 0 && (
-        <ProductSection title="LAST PIECES" products={lastPieces} />
+        <ProductSection
+          title="LAST PIECES"
+          products={lastPieces}
+          viewAllHref="/products?section=last-pieces"
+        />
       )}
       <Footer />
     </>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import Item from "./ProductCard";
 import ChevronLeftIcon from "../assets/icons/ChevronLeftIcon";
 import ChevronRightIcon from "../assets/icons/ChevronRightIcon";
@@ -68,13 +69,14 @@ export default function ProductSection({
             </h2>
             <div className="mx-auto mt-3 h-0.5 w-full max-w-md bg-[var(--brand)]" />
           </div>
-          {viewAllTitle && <a
-            href={viewAllHref}
-            className="absolute right-0 top-0 text-sm text-neutral-500 underline-offset-4 hover:underline"
-          >
-            View all
-          </a>
-          }
+          {viewAllTitle && (
+            <Link
+              to={viewAllHref}
+              className="absolute right-0 top-0 text-sm text-neutral-500 underline-offset-4 hover:underline"
+            >
+              View all
+            </Link>
+          )}
         </div>
 
         <div className="relative flex items-center gap-2 sm:gap-4">
@@ -100,6 +102,7 @@ export default function ProductSection({
                 className="w-[calc((100%-4rem)/5)] min-w-[180px] shrink-0 sm:min-w-[200px] lg:min-w-0"
               >
                 <Item
+                  href={`/products/${product.id}`}
                   image={product.image}
                   title={product.title}
                   rating={product.rating}

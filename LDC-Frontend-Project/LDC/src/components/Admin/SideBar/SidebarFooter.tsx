@@ -1,13 +1,17 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { footerItems } from "./Sidebar-items";
+import { useAppDispatch } from "../../../store/hooks";
+import { logout } from "../../../store/slices/authslice";
+import { clearToken } from "../../../utils/auth";
 
 export default function FooterMenu() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   function handleLogout() {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
+    clearToken();
+    dispatch(logout());
     navigate("/login", { replace: true });
   }
 

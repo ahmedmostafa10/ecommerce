@@ -1,78 +1,30 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../../components/layout/Footer";
 import Header from "../../components/layout/Header";
 import AnnouncementBar from "../../components/Header/AnnouncementBar";
-import CartItem, { type CartItemData } from "../../components/Cart/CartItem";
+import CartItem from "../../components/Cart/CartItem";
 import OrderSummary from "../../components/Cart/OrderSummary";
-import coatImg from "../../assets/categories/shirt.webp";
-import hoodieImg from "../../assets/categories/Tshirt.webp";
-import jeansImg from "../../assets/categories/jeans.webp";
+import { useToast } from "../../components/ui/ToastProvider";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  removeFromCart,
+  selectCartItems,
+  selectCartSubtotal,
+  setQuantity,
+} from "../../store/slices/cartslice";
 
-const DISCOUNT_PERCENT = 20;
 const DELIVERY_FEE = 15;
 
-const INITIAL_CART_ITEMS: CartItemData[] = [
-  {
-    id: "gradient-graphic-tshirt",
-    image: hoodieImg,
-    title: "Gradient Graphic T-shirt",
-    price: 145,
-    size: "Large",
-    color: "White",
-    quantity: 1,
-  },
-  {
-    id: "checkered-shirt",
-    image: coatImg,
-    title: "Checkered Shirt",
-    price: 180,
-    size: "Medium",
-    color: "Red",
-    quantity: 1,
-  },
-  {
-    id: "skinny-fit-jeans",
-    image: jeansImg,
-    title: "Skinny Fit Jeans",
-    price: 240,
-    size: "Large",
-    color: "Blue",
-    quantity: 1,
-  },
-];
-
 export default function Cart() {
-  const [items, setItems] = useState<CartItemData[]>(INITIAL_CART_ITEMS);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const toast = useToast();
 
-  const handleQuantityChange = (id: string, quantity: number) => {
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id ? { ...item, quantity } : item,
-      ),
-    );
-  };
+  const items = useAppSelector(selectCartItems);
+  const subtotal = useAppSelector(selectCartSubtotal);
 
-  const handleRemove = (id: string) => {
-    setItems((current) => current.filter((item) => item.id !== id));
-  };
-
-  const { subtotal, discount, total } = useMemo(() => {
-    const subtotalValue = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0,
-    );
-    const discountValue = Math.round(
-      subtotalValue * (DISCOUNT_PERCENT / 100),
-    );
-    const totalValue = subtotalValue - discountValue + DELIVERY_FEE;
-
-    return {
-      subtotal: subtotalValue,
-      discount: discountValue,
-      total: totalValue,
-    };
-  }, [items]);
+  const discount = 0;
+  const total = subtotal - discount + (items.length > 0 ? DELIVERY_FEE : 0);
 
   return (
     <>
@@ -90,7 +42,7 @@ export default function Cart() {
               Your cart is empty. Start shopping to add items.
             </p>
             <Link
-              to="/Products"
+              to="/products"
               className="inline-flex h-14 items-center justify-center rounded-full bg-black px-8 text-base font-medium text-white transition hover:opacity-90"
             >
               Browse Products
@@ -105,9 +57,24 @@ export default function Cart() {
               {items.map((item, index) => (
                 <CartItem
                   key={item.id}
-                  item={item}
-                  onQuantityChange={handleQuantityChange}
-                  onRemove={handleRemove}
+                  item={{
+                    id: item.id,
+                    image: item.image,
+                    title: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    maxQuantity: item.maxQuantity,
+                  }}
+                  onQuantityChange={(id, quantity) =>
+                    dispatch(setQuantity({ id, quantity }))
+                  }
+                  onRemove={(id) => {
+                    dispatch(removeFromCart(id));
+                    toast({
+                      message: "Removed from cart",
+                      description: item.name,
+                    });
+                  }}
                   isLast={index === items.length - 1}
                 />
               ))}
@@ -116,9 +83,9 @@ export default function Cart() {
             <OrderSummary
               subtotal={subtotal}
               discount={discount}
-              discountPercent={DISCOUNT_PERCENT}
               deliveryFee={DELIVERY_FEE}
               total={total}
+              onCheckout={() => navigate("/checkout")}
               className="lg:sticky lg:top-8"
             />
           </div>

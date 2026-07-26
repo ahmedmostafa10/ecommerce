@@ -6,9 +6,10 @@ export type CartItemData = {
   image: string;
   title: string;
   price: number;
-  size: string;
-  color: string;
+  size?: string;
+  color?: string;
   quantity: number;
+  maxQuantity?: number;
 };
 
 type CartItemProps = {
@@ -42,14 +43,16 @@ export default function CartItem({
             {item.title}
           </h3>
 
-          <p className="mt-2 text-sm text-neutral-500 sm:text-base">
-            Size:{" "}
-            <span className="text-neutral-500">{item.size}</span>
-          </p>
-          <p className="mt-0.5 text-sm text-neutral-500 sm:text-base">
-            Color:{" "}
-            <span className="text-neutral-500">{item.color}</span>
-          </p>
+          {item.size && (
+            <p className="mt-2 text-sm text-neutral-500 sm:text-base">
+              Size: <span className="text-neutral-500">{item.size}</span>
+            </p>
+          )}
+          {item.color && (
+            <p className="mt-0.5 text-sm text-neutral-500 sm:text-base">
+              Color: <span className="text-neutral-500">{item.color}</span>
+            </p>
+          )}
           <p className="mt-3 text-xl font-bold text-black sm:mt-4">
             ${item.price}
           </p>
@@ -68,6 +71,7 @@ export default function CartItem({
           <QuantitySelector
             value={item.quantity}
             onChange={(quantity) => onQuantityChange(item.id, quantity)}
+            max={item.maxQuantity}
             size="sm"
             className="w-[88px] sm:w-auto"
           />

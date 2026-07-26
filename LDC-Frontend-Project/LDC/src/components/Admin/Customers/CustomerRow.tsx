@@ -1,5 +1,5 @@
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import type { Customer } from "../../../data/adminCustomers";
+import type { Customer } from "./useCustomers";
 
 type CustomerRowProps = {
   customer: Customer;

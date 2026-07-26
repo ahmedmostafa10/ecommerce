@@ -4,10 +4,9 @@ import DateFilter from "../../ui/DateFilter";
 import FilterDropdown from "../../ui/FilterDropdown";
 import { emptyRange, inDateRange, useFilters } from "../../ui/filtering";
 import CustomerRow from "./CustomerRow";
-import { adminCustomers, type Customer } from "../../../data/adminCustomers";
+import { useCustomers, type Customer } from "./useCustomers";
 
-/** Also drives Status sorting. */
-const STATUSES = ["Active", "Blocked"];
+const STATUSES = ["Active", "InActive"];
 
 const COLUMNS: Column<Customer>[] = [
   { header: "Customer Name", sortValue: (c) => c.name },
@@ -15,7 +14,7 @@ const COLUMNS: Column<Customer>[] = [
   { header: "Orders", sortValue: (c) => c.orders },
   { header: "Balance", sortValue: (c) => c.balance },
   { header: "Status", sortValue: (c) => STATUSES.indexOf(c.status) },
-  { header: "Created", sortValue: (c) => Date.parse(c.created) || 0 },
+  { header: "Created", sortValue: (c) => c.createdAt },
   { header: "Action" },
 ];
 
@@ -25,9 +24,11 @@ export default function CustomerTable() {
   const { toggleFilter, clearFilters, selected, matches, activeCount } =
     useFilters();
 
+  const { customers, loading, error } = useCustomers();
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return adminCustomers.filter(
+    return customers.filter(
       (c) =>
         (!q ||
           c.name.toLowerCase().includes(q) ||
@@ -36,10 +37,10 @@ export default function CustomerTable() {
         matches("status", c.status) &&
         inDateRange(c.created, range),
     );
-  }, [search, range, matches]);
+  }, [customers, search, range, matches]);
 
   return (
-    <DataTable
+    <DataTable<Customer>
       title="Customer"
       breadcrumb={[
         { label: "Dashboard", href: "/admin/dashboard" },
@@ -77,6 +78,8 @@ export default function CustomerTable() {
         />
       )}
       emptyMessage="No customers found."
+      loading={loading}
+      error={error}
       selectAllLabel="Select all customers"
     />
   );

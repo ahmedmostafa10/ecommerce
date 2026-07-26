@@ -6,9 +6,12 @@ import AuthLayout from "../../components/layout/AuthLayout";
 import InputField from "../../components/ui/InputField";
 import Button from "../../components/ui/CustomButton";
 import { register } from "../../services/auth";
+import { useAppDispatch } from "../../store/hooks";
+import { setUser } from "../../store/slices/authslice";
 
 export default function Register() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [form, setForm] = useState({
     name: "",
     address: "",
@@ -42,6 +45,7 @@ export default function Register() {
         password: form.password,
       });
       localStorage.setItem("token", JSON.stringify(user.token));
+      dispatch(setUser(user));
       navigate("/Home");
     } catch (err) {
       setError(

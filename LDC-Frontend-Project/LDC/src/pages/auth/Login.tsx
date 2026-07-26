@@ -7,9 +7,12 @@ import InputField from "../../components/ui/InputField";
 import Checkbox from "../../components/ui/Checkbox";
 import Button from "../../components/ui/CustomButton";
 import { login } from "../../services/auth";
+import { useAppDispatch } from "../../store/hooks";
+import { setUser } from "../../store/slices/authslice";
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -41,6 +44,7 @@ export default function Login() {
       } else {
         sessionStorage.setItem("token", JSON.stringify(user.token));
       }
+      dispatch(setUser(user));
       navigate("/Home");
     } catch (err) {
       setError(

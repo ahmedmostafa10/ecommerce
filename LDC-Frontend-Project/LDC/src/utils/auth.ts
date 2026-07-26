@@ -27,6 +27,11 @@ export function getToken(): string | null {
   }
 }
 
+export function hasValidSession(): boolean {
+  const token = getToken();
+  return !!token && !isTokenExpired(token);
+}
+
 export function clearToken() {
   localStorage.removeItem("token");
   sessionStorage.removeItem("token");

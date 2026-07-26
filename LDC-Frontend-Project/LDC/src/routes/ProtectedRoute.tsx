@@ -1,14 +1,21 @@
+import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { isTokenExpired } from "../utils/auth";
+import { clearToken, hasValidSession } from "../utils/auth";
+import { useAppDispatch } from "../store/hooks";
+import { logout } from "../store/slices/authslice";
 
 export default function ProtectedRoute() {
-  const token =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
+  const dispatch = useAppDispatch();
+  const valid = hasValidSession();
 
-  if (!token || isTokenExpired(token)) {
-    localStorage.removeItem("token");
-    return <Navigate to="/login" replace />;
-  }
+  useEffect(() => {
+    if (!valid) {
+      clearToken();
+      dispatch(logout());
+    }
+  }, [valid, dispatch]);
+
+  if (!valid) return <Navigate to="/login" replace />;
 
   return <Outlet />;
 }

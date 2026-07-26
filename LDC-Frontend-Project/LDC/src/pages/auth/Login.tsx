@@ -45,7 +45,7 @@ export default function Login() {
         sessionStorage.setItem("token", JSON.stringify(user.token));
       }
       dispatch(setUser(user));
-      navigate("/Home");
+      navigate(user.isAdmin ? "/admin/dashboard" : "/Home", { replace: true });
     } catch (err) {
       setError(
         (isAxiosError(err) && err.response?.data?.message) ||

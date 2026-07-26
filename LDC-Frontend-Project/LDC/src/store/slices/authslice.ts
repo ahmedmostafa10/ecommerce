@@ -44,5 +44,7 @@ export default authSlice.reducer;
 export const selectUser = (state: { auth: AuthState }) => state.auth.user;
 export const selectIsAuthenticated = (state: { auth: AuthState }) =>
   state.auth.isAuthenticated;
+export const selectIsAdmin = (state: { auth: AuthState }) =>
+  state.auth.user?.isAdmin === true;
 
 export { STORAGE_KEY as AUTH_STORAGE_KEY };

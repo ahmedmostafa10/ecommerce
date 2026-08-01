@@ -22,7 +22,7 @@ export const mainItems = [
     title: "Orders",
     href: "/admin/orders",
     icon: ShoppingCart,
-    badge: 2,
+    badgeKey: "orders" as const,
   },
   {
     title: "Customers",

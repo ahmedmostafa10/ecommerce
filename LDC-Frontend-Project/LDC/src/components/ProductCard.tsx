@@ -33,7 +33,7 @@ export default function Item({
 
   const content = (
     <>
-      <div className="overflow-hidden rounded-[20px] bg-neutral-100 aspect-4/5">
+      <div className="overflow-hidden rounded-[20px] bg-neutral-100 ">
         <div className="flex  items-center justify-center">
           <img
             src={image}

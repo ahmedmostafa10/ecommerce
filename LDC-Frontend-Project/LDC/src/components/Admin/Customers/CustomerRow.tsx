@@ -86,7 +86,7 @@ export default function CustomerRow({
         </span>
       </td>
 
-      {/* Actions */}
+      {/* Actions
       <td className="py-3.5 pr-5">
         <div className="flex items-center gap-1">
           <button
@@ -114,7 +114,7 @@ export default function CustomerRow({
             <Trash2 size={16} />
           </button>
         </div>
-      </td>
+      </td> */}
     </tr>
   );
 }

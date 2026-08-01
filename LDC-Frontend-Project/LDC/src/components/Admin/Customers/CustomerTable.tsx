@@ -15,7 +15,7 @@ const COLUMNS: Column<Customer>[] = [
   { header: "Balance", sortValue: (c) => c.balance },
   { header: "Status", sortValue: (c) => STATUSES.indexOf(c.status) },
   { header: "Created", sortValue: (c) => c.createdAt },
-  { header: "Action" },
+  // { header: "Action" },
 ];
 
 export default function CustomerTable() {

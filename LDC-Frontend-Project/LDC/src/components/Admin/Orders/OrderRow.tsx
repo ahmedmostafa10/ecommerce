@@ -69,24 +69,8 @@ export default function OrderRow({
       </td>
 
       {/* Actions */}
-      <td className="py-3.5 pr-5">
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => onView?.(order)}
-            aria-label={`View order ${order.orderNumber}`}
-            className="rounded-md p-1.5 text-gray-400 transition hover:bg-violet-100 hover:text-violet-600"
-          >
-            <Eye size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => onEdit?.(order)}
-            aria-label={`Edit order ${order.orderNumber}`}
-            className="rounded-md p-1.5 text-gray-400 transition hover:bg-violet-100 hover:text-violet-600"
-          >
-            <Pencil size={16} />
-          </button>
+      <td className="py-3.5 pl-2">
+        <div className="flex items-center justify-start gap-1">
           <button
             type="button"
             onClick={() => onDelete?.(order)}

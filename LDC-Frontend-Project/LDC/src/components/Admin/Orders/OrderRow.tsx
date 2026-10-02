@@ -1,4 +1,4 @@
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import type { Order } from "./useOrders";
 
 type OrderRowProps = {
@@ -14,8 +14,6 @@ export default function OrderRow({
   order,
   selected,
   onToggle,
-  onView,
-  onEdit,
   onDelete,
 }: OrderRowProps) {
   return (

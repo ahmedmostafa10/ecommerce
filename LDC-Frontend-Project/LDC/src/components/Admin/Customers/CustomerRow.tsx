@@ -1,4 +1,3 @@
-import { Eye, Pencil, Trash2 } from "lucide-react";
 import type { Customer } from "./useCustomers";
 
 type CustomerRowProps = {
@@ -14,9 +13,6 @@ export default function CustomerRow({
   customer,
   selected,
   onToggle,
-  onView,
-  onEdit,
-  onDelete,
 }: CustomerRowProps) {
   return (
     <tr className="group border-b border-[#E0E2E7] bg-white transition-colors hover:bg-violet-50/30">

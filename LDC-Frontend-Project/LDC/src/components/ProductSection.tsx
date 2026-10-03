@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import Item from "./ProductCard";
+import ChevronLeftIcon from "../assets/icons/ChevronLeftIcon";
+import ChevronRightIcon from "../assets/icons/ChevronRightIcon";
 
 export type ProductSectionItem = {
   id: string;
   image: string;
   title: string;
-  rating: number;
+  rating?: number;
   price: number;
   originalPrice?: number;
 };
@@ -16,27 +19,6 @@ type ProductSectionProps = {
   viewAllTitle?: boolean;
   viewAllHref?: string;
 };
-
-function ChevronIcon({ direction }: { direction: "left" | "right" }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-5 w-5 flex items-center justify-center"
-    >
-      {direction === "left" ? (
-        <path d="M15 18l-6-6 6-6" />
-      ) : (
-        <path d="M9 18l6-6-6-6" />
-      )}
-    </svg>
-  );
-}
 
 export default function ProductSection({
   title,
@@ -87,13 +69,14 @@ export default function ProductSection({
             </h2>
             <div className="mx-auto mt-3 h-0.5 w-full max-w-md bg-[var(--brand)]" />
           </div>
-          {viewAllTitle && <a
-            href={viewAllHref}
-            className="absolute right-0 top-0 text-sm text-neutral-500 underline-offset-4 hover:underline"
-          >
-            View all
-          </a>
-          }
+          {viewAllTitle && (
+            <Link
+              to={viewAllHref}
+              className="absolute right-0 top-0 text-sm text-neutral-500 underline-offset-4 hover:underline"
+            >
+              View all
+            </Link>
+          )}
         </div>
 
         <div className="relative flex items-center gap-2 sm:gap-4">
@@ -104,7 +87,7 @@ export default function ProductSection({
             aria-label={`Previous ${title.toLowerCase()}`}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 text-[var(--brand)] transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <ChevronIcon direction="left" />
+            <ChevronLeftIcon className="h-5 w-5" />
           </button>
 
           <div
@@ -119,6 +102,7 @@ export default function ProductSection({
                 className="w-[calc((100%-4rem)/5)] min-w-[180px] shrink-0 sm:min-w-[200px] lg:min-w-0"
               >
                 <Item
+                  href={`/products/${product.id}`}
                   image={product.image}
                   title={product.title}
                   rating={product.rating}
@@ -136,7 +120,7 @@ export default function ProductSection({
             aria-label={`Next ${title.toLowerCase()}`}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 text-[var(--brand)] transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <ChevronIcon direction="right" />
+            <ChevronRightIcon className="h-5 w-5" />
           </button>
         </div>
       </div>

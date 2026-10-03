@@ -23,5 +23,6 @@ backend:
 
 frontend:
 	$(NPM) --prefix "$(FRONTEND_DIR)" install
+	$(NPM) --prefix "$(FRONTEND_DIR)" run build
 	$(NPM) --prefix "$(FRONTEND_DIR)" run dev
 

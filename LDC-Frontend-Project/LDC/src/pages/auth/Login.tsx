@@ -5,11 +5,14 @@ import { isAxiosError } from "axios";
 import AuthLayout from "../../components/layout/AuthLayout";
 import InputField from "../../components/ui/InputField";
 import Checkbox from "../../components/ui/Checkbox";
-import Button from "../../components/ui/Button";
+import Button from "../../components/ui/CustomButton";
 import { login } from "../../services/auth";
+import { useAppDispatch } from "../../store/hooks";
+import { setUser } from "../../store/slices/authslice";
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -32,12 +35,17 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      const { data: customer } = await login({
+      const { data: user } = await login({
         email: form.email,
         password: form.password,
       });
-      localStorage.setItem("customer", JSON.stringify(customer));
-      navigate("/Home");
+      if (form.remember) {
+        localStorage.setItem("token", JSON.stringify(user.token));
+      } else {
+        sessionStorage.setItem("token", JSON.stringify(user.token));
+      }
+      dispatch(setUser(user));
+      navigate(user.isAdmin ? "/admin/dashboard" : "/Home", { replace: true });
     } catch (err) {
       setError(
         (isAxiosError(err) && err.response?.data?.message) ||

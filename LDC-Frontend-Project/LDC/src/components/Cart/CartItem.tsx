@@ -1,13 +1,15 @@
 import QuantitySelector from "../ui/QuantitySelector";
+import TrashIcon from "../../assets/icons/TrashIcon";
 
 export type CartItemData = {
   id: string;
   image: string;
   title: string;
   price: number;
-  size: string;
-  color: string;
+  size?: string;
+  color?: string;
   quantity: number;
+  maxQuantity?: number;
 };
 
 type CartItemProps = {
@@ -16,26 +18,6 @@ type CartItemProps = {
   onRemove: (id: string) => void;
   isLast?: boolean;
 };
-
-function TrashIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-[18px] w-[18px]"
-    >
-      <path d="M3 6h18" />
-      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-    </svg>
-  );
-}
 
 export default function CartItem({
   item,
@@ -61,14 +43,16 @@ export default function CartItem({
             {item.title}
           </h3>
 
-          <p className="mt-2 text-sm text-neutral-500 sm:text-base">
-            Size:{" "}
-            <span className="text-neutral-500">{item.size}</span>
-          </p>
-          <p className="mt-0.5 text-sm text-neutral-500 sm:text-base">
-            Color:{" "}
-            <span className="text-neutral-500">{item.color}</span>
-          </p>
+          {item.size && (
+            <p className="mt-2 text-sm text-neutral-500 sm:text-base">
+              Size: <span className="text-neutral-500">{item.size}</span>
+            </p>
+          )}
+          {item.color && (
+            <p className="mt-0.5 text-sm text-neutral-500 sm:text-base">
+              Color: <span className="text-neutral-500">{item.color}</span>
+            </p>
+          )}
           <p className="mt-3 text-xl font-bold text-black sm:mt-4">
             ${item.price}
           </p>
@@ -81,12 +65,13 @@ export default function CartItem({
             aria-label={`Remove ${item.title} from cart`}
             className="shrink-0 text-[#ff3333] transition hover:opacity-70"
           >
-            <TrashIcon />
+            <TrashIcon className="h-[18px] w-[18px]" />
           </button>
 
           <QuantitySelector
             value={item.quantity}
             onChange={(quantity) => onQuantityChange(item.id, quantity)}
+            max={item.maxQuantity}
             size="sm"
             className="w-[88px] sm:w-auto"
           />

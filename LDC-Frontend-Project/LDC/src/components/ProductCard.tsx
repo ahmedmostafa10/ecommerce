@@ -1,11 +1,13 @@
+import { Link } from "react-router-dom";
 import Rating from "./ui/Rating";
 
 type ItemProps = {
   image: string;
   title: string;
-  rating: number;
+  rating?: number;
   price: number;
   originalPrice?: number;
+  href?: string;
   onClick?: () => void;
   className?: string;
 };
@@ -16,23 +18,22 @@ export default function Item({
   rating,
   price,
   originalPrice,
+  href,
   onClick,
   className = "",
 }: ItemProps) {
-  const Wrapper = onClick ? "button" : "article";
-  const hasDiscount =
-    originalPrice !== undefined && originalPrice > price;
+  const hasDiscount = originalPrice !== undefined && originalPrice > price;
   const discountPercent = hasDiscount
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
 
-  return (
-    <Wrapper
-      type={onClick ? "button" : undefined}
-      onClick={onClick}
-      className={`flex w-full flex-col gap-3 text-left ${onClick ? "cursor-pointer" : ""} ${className}`}
-    >
-      <div className="overflow-hidden rounded-[20px] bg-neutral-100 aspect-4/5">
+  const wrapperClass = `flex w-full flex-col gap-3 text-left ${
+    href || onClick ? "cursor-pointer" : ""
+  } ${className}`;
+
+  const content = (
+    <>
+      <div className="overflow-hidden rounded-[20px] bg-neutral-100 ">
         <div className="flex  items-center justify-center">
           <img
             src={image}
@@ -47,7 +48,7 @@ export default function Item({
           {title}
         </h3>
 
-        <Rating value={rating} />
+        {rating !== undefined && <Rating value={rating} />}
 
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-2xl font-bold text-[var(--brand)]">${price}</p>
@@ -63,6 +64,24 @@ export default function Item({
           )}
         </div>
       </div>
-    </Wrapper>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link to={href} onClick={onClick} className={wrapperClass}>
+        {content}
+      </Link>
+    );
+  }
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={wrapperClass}>
+        {content}
+      </button>
+    );
+  }
+
+  return <article className={wrapperClass}>{content}</article>;
 }

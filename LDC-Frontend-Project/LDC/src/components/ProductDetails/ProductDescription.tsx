@@ -17,7 +17,7 @@ type ProductDescriptionProps = {
 
 export default function ProductDescription({
   title = "One Life Graphic T-shirt",
-  rating = 4.5,
+  rating,
   price = 260,
   originalPrice = 300,
   description = "This graphic t-shirt which is perfect for any occasion. Crafted from a soft and breathable fabric, it offers superior comfort and style.",
@@ -45,7 +45,7 @@ export default function ProductDescription({
         <h1 className="text-3xl font-bold text-[var(--brand)] sm:text-4xl">
           {title}
         </h1>
-        <Rating value={rating} size="md" />
+        {rating !== undefined && <Rating value={rating} size="md" />}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

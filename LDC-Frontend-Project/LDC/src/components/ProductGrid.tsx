@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import ProductCard from "./ProductCard";
+import ChevronDownIcon from "../assets/icons/ChevronDownIcon";
 import jacketImg from "../assets/categories/image.png";
 import hoodieImg from "../assets/categories/Tshirt.webp";
 import trousersImg from "../assets/categories/pants.webp";
@@ -11,7 +12,7 @@ export type ProductGridItem = {
   id: string;
   image: string;
   title: string;
-  rating: number;
+  rating?: number;
   price: number;
   originalPrice?: number;
 };
@@ -105,23 +106,6 @@ type ProductGridProps = {
   className?: string;
 };
 
-function ChevronIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
-    >
-      <path d="M6 9l6 6 6-6" />
-    </svg>
-  );
-}
-
 function sortProducts(products: ProductGridItem[], sortBy: SortOption) {
   const sorted = [...products];
 
@@ -131,7 +115,7 @@ function sortProducts(products: ProductGridItem[], sortBy: SortOption) {
     case "price-high-low":
       return sorted.sort((a, b) => b.price - a.price);
     case "rating":
-      return sorted.sort((a, b) => b.rating - a.rating);
+      return sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     default:
       return sorted;
   }
@@ -183,7 +167,7 @@ export default function ProductGrid({
                   </option>
                 ))}
               </select>
-              <ChevronIcon />
+              <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             </div>
           </div>
         </div>
@@ -193,6 +177,7 @@ export default function ProductGrid({
         {sortedProducts.map((product) => (
           <ProductCard
             key={product.id}
+            href={`/products/${product.id}`}
             image={product.image}
             title={product.title}
             rating={product.rating}

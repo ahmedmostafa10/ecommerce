@@ -1,30 +1,12 @@
+import ArrowLeftIcon from "../../assets/icons/ArrowLeftIcon";
+import ArrowRightIcon from "../../assets/icons/ArrowRightIcon";
+
 type PaginationProps = {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
   className?: string;
 };
-
-function ArrowIcon({ direction }: { direction: "left" | "right" }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-4 w-4"
-    >
-      {direction === "left" ? (
-        <path d="M19 12H5M12 19l-7-7 7-7" />
-      ) : (
-        <path d="M5 12h14M12 5l7 7-7 7" />
-      )}
-    </svg>
-  );
-}
 
 function getPaginationItems(
   currentPage: number,
@@ -81,7 +63,7 @@ export default function Pagination({
         aria-label="Previous page"
         className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-[var(--brand)] transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        <ArrowIcon direction="left" />
+        <ArrowLeftIcon className="h-4 w-4" />
         Previous
       </button>
 
@@ -128,7 +110,7 @@ export default function Pagination({
         className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-[var(--brand)] transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40"
       >
         Next
-        <ArrowIcon direction="right" />
+        <ArrowRightIcon className="h-4 w-4" />
       </button>
     </nav>
   );

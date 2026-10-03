@@ -9,12 +9,13 @@ export interface RegisterRequest {
   password: string;
 }
 
-export interface Customer {
+export interface User {
   id: string;
   isAdmin: boolean;
   createdOn: string;
   updatedOn: string;
   isDeleted: boolean;
+  token: string;
   name: string;
   address: string;
   phone: string;
@@ -35,18 +36,16 @@ export interface ApiResponse<T> {
 
 export async function register(
   payload: Omit<RegisterRequest, "status">,
-): Promise<ApiResponse<Customer>> {
-  const { data } = await api.post<ApiResponse<Customer>>("/Customer/register", {
+): Promise<ApiResponse<User>> {
+  const { data } = await api.post<ApiResponse<User>>("/Customer/register", {
     ...payload,
     status: "Active",
   });
   return data;
 }
 
-export async function login(
-  payload: LoginRequest,
-): Promise<ApiResponse<Customer>> {
-  const { data } = await api.post<ApiResponse<Customer>>(
+export async function login(payload: LoginRequest): Promise<ApiResponse<User>> {
+  const { data } = await api.post<ApiResponse<User>>(
     "/Customer/login",
     payload,
   );
